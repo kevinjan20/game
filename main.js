@@ -354,7 +354,7 @@ async function savePlayerData() {
 }
 
 // 從 Realtime Database 載入玩家資料
-// 返回 true 如果成功載入資料，否則返回 false
+// 從 Realtime Database 載入玩家資料
 async function loadPlayerData() {
     if (!database || !userId) {
         console.error("Realtime Database 或使用者 ID 未準備好。無法載入資料。");
@@ -366,37 +366,53 @@ async function loadPlayerData() {
 
         if (snapshot.exists()) {
             const loadedData = snapshot.val();
-            player = { ...player, ...loadedData }; // 合併載入的資料
+            console.log("原始載入資料 (loadPlayerData):", loadedData); // 除錯日誌
 
-            console.log("玩家資料載入成功！", player);
-            log(`歡迎回來，${player.name}！你的遊戲進度已載入。`);
-            
-            // 重要：直接切換到遊戲介面
-            document.getElementById("game-intro").style.display = "none";
-            document.getElementById("nameInputScreen").style.display = "none";
+            // 儲存載入資料中裝備武器的名稱
+            const equippedWeaponNameFromLoadedData = loadedData.weapon ? loadedData.weapon.name : null;
 
-            // ✅ 判斷是否已通關
-            if (player.bossStatus?.finalBoss?.defeated) {
-                document.getElementById("endingScreen").style.display = "flex";
-                document.getElementById("game-interface").style.display = "none";
-                document.getElementById("endingPlayerName").textContent = player.name;
+            // 合併載入的資料，確保所有屬性都更新
+            // 注意：這裡直接賦值會導致 player.weapon 變成一個新的物件實例
+            Object.assign(player, loadedData);
+
+            // 重新連結 player.weapon 到 player.inventory 中的正確物件實例
+            // 只有當載入的裝備武器不是預設的「木棍」時才需要重新連結
+            if (equippedWeaponNameFromLoadedData && equippedWeaponNameFromLoadedData !== "木棍") {
+                const equippedInInventory = player.inventory.find(item => item.name === equippedWeaponNameFromLoadedData);
+                if (equippedInInventory) {
+                    player.weapon = equippedInInventory; // 將 player.weapon 指向背包中的實際物件
+                    console.log("重新連結裝備中的武器到背包實例:", player.weapon.name);
+                } else {
+                    // 如果載入的裝備武器在背包中找不到，則重設為預設武器
+                    player.weapon = { name: "木棍", power: 0, rarity: "普通" };
+                    console.warn("載入的裝備武器在背包中找不到。重設為預設木棍。");
+                }
             } else {
-                document.getElementById("game-interface").style.display = "block";
-                updateStatus();
-                goToTown();
+                // 如果載入的裝備武器是預設木棍，確保 player.weapon 也是預設值
+                player.weapon = { name: "木棍", power: 0, rarity: "普通" };
             }
 
-            return true; // 成功載入資料
+
+            // 額外檢查並確保 player.name 被正確設定
+            if (loadedData.name && typeof loadedData.name === 'string' && loadedData.name.trim() !== "") {
+                player.name = loadedData.name.trim();
+            } else {
+                console.warn("載入的玩家資料中沒有有效名稱，將使用現有名稱或預設名稱。");
+            }
+
+            console.log("玩家資料載入成功！當前玩家名稱:", player.name); // 除錯日誌
+            log(`歡迎回來，${player.name}！你的遊戲進度已載入。`);
+            
+            return true;
         } else {
             console.log("沒有找到玩家資料，開始新遊戲流程。");
-            return false; // 沒有找到資料
+            return false;
         }
     } catch (e) {
         console.error("載入玩家資料時出錯: ", e);
-        return false; // 載入失敗
+        return false;
     }
 }
-
 function getPlayerAttack() {
     return player.attackBase + (player.weapon ? player.weapon.power : 0);
 }
@@ -508,31 +524,29 @@ function goToTown() {
 
 let shopEntryLocation = 'town'; // 全域變數，只宣告一次
 
-function enterShop(fromLocation) { // 注意：這裡移除預設值 = 'town'
+function enterShop(fromLocation) {
     console.log("進入 enterShop 函式...");
     console.log("接收到的 fromLocation 參數:", fromLocation);
 
-    // 只有當 fromLocation 有值 (也就是從村莊入口點擊進來時)，才更新 shopEntryLocation
-    // 否則，保持原有的 shopEntryLocation (即從 buy/sell 函式呼叫時，不改變來源)
     if (fromLocation !== undefined && fromLocation !== null) {
         shopEntryLocation = fromLocation;
     }
     console.log("更新後的 shopEntryLocation:", shopEntryLocation);
 
-
     let shopHtml = `
         <strong>你目前在：</strong> 商店<br>
         <button onclick="buyPotion()">購買藥水（${potionBuyPrice}金幣，回復${potionHealAmount}HP）</button><br>
-        <button onclick="buyLargePotion()">購買大藥水（${largePotionBuyPrice}金幣，回復${largePotionHealAmount}HP）</button>
+        <button onclick="buyLargePotion()">購買大藥水（${largePotionHealAmount}金幣，回復${largePotionHealAmount}HP）</button>
         <br><br>
         <strong>出售裝備：</strong><br>
     `;
 
-     const sellableWeapons = {}; // 用於儲存可出售的武器及其數量
+    const sellableWeapons = {}; // 用於儲存可出售的武器及其數量
 
-     player.inventory.forEach((item) => {
-        // 只有當前物品不是裝備中的武器時，才將其加入可出售列表
-        if (player.weapon !== item) { // 檢查是否是裝備中的特定物件實例
+    player.inventory.forEach((item) => {
+        // 只有當前物品不是裝備中的武器實例時，才將其加入可出售列表
+        // 這裡的判斷 now relies on player.weapon being the exact instance from inventory
+        if (player.weapon !== item) { 
             if (sellableWeapons[item.name]) {
                 sellableWeapons[item.name].count++;
             } else {
@@ -558,16 +572,14 @@ function enterShop(fromLocation) { // 注意：這裡移除預設值 = 'town'
         });
     }
 
-
-    // 根據儲存的 shopEntryLocation 決定返回哪個村莊
     let returnButton = '';
     if (shopEntryLocation === 'warrior') {
         returnButton = `<button onclick="goToWarriorVillage()">離開商店</button>`;
         log("你進入了商店。");
-    } else if (shopEntryLocation === 'perion') { // --- 新增這裡 ---
+    } else if (shopEntryLocation === 'perion') {
         returnButton = `<button onclick="goToPerion()">離開商店</button>`;
         log("你進入了商店。");
-    } else { // 預設為 'town'
+    } else {
         returnButton = `<button onclick="goToTown()">離開商店</button>`;
         log("你進入了商店。");
     }
@@ -615,6 +627,7 @@ function getSellPrice(rarity) {
     }
 }
 
+// 修改 sellWeapon 函式，接收武器名稱
 function sellWeapon(weaponName) {
     // 尋找背包中第一個 "未裝備" 且名稱匹配的武器
     let foundIndex = -1;
