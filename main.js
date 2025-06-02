@@ -717,7 +717,7 @@ function selectWeaponForForge(index) {
     selectedWeaponForForge = weapon;
 
     const basePrice = getUpgradeBasePrice(weapon);
-    const price = basePrice + weapon.power * 5;
+    const price = basePrice + weapon.power * 3;
 
     document.getElementById("selectedWeaponInfo").innerHTML = `
         <p>選擇的武器：${weapon.name}</p>
@@ -731,7 +731,7 @@ function upgradeWeapon() {
     if (!selectedWeaponForForge) return;
 
     const basePrice = getUpgradeBasePrice(selectedWeaponForForge);
-    const price = basePrice + selectedWeaponForForge.power * 10;
+    const price = basePrice + selectedWeaponForForge.power * 3;
 
     if (player.gold >= price) {
         player.gold -= price;
@@ -750,7 +750,7 @@ function getUpgradeBasePrice(weapon) {
     switch (weapon.rarity) {
         case "普通": return 10;
         case "稀有": return 30;
-        case "傳說": return 100;
+        case "傳說": return 50;
         default: return 20;
     }
 }
