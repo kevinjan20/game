@@ -1,0 +1,63 @@
+/* style.css */
+
+/* 其他 body 和 .panel 樣式保持不變 */
+
+body {
+    font-family: "Courier New", monospace;
+    background: #f0f0f0;
+    color: #333;
+    padding: 20px;
+    display: flex; /* 這將影響 game-intro 和 game-interface 的佈局 */
+    justify-content: space-between;
+}
+
+.panel {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    /* 這裡的 width: 250%; 仍然可能導致問題，請確保遊戲介面不會過寬 */
+    width: 250%; /* 你可能需要重新考慮這個寬度設定 */
+}
+
+button {
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+#log {
+    white-space: pre-wrap;
+    background: #222;
+    color: #0f0;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    height: 80vh;
+    overflow-y: auto;
+    width: 35%;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    box-sizing: border-box;
+}
+
+/* 這是最關鍵的部分：讓 endingScreen 初始隱藏並全屏覆蓋 */
+#endingScreen {
+    display: none; /* ✅ 只有這個，初始隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    padding: 50px;
+
+    /* 保留彈性盒排版（不改 display） */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

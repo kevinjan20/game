@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <title>文字版冒險遊戲</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-intro" class="panel">
+    <h2>歡迎來到文字版冒險遊戲！</h2>
+    <p>你的目標是收集散落在三個不同地區的魔法碎片，擊敗守護這些碎片的強大首領。</p>
+    <p>一旦收集完所有碎片，你將可以挑戰最終魔王「黑魔法師」，拯救這個世界！</p>
+
+    <h3>🎮 遊戲玩法說明：</h3>
+    <ul style="text-align: left; line-height: 1.8;">
+        <li>👤 <strong>輸入你的冒險者姓名</strong>，開始旅程。</li>
+        <li>🗺️ 透過畫面中的按鈕，在村莊與野外地區間移動。</li>
+        <li>⚔️ 點選「遇怪！」進行戰鬥，擊敗怪物可獲得經驗值與裝備。</li>
+        <li>🏕️ 每個地區最深處有一隻<strong>Boss</strong>，擊敗後可獲得魔法碎片。</li>
+        <li>🧪 可在商店購買藥水、出售多餘裝備。</li>
+        <li>📦 背包中可裝備武器或丟棄不要的裝備。</li>
+        <li>🌟 當經驗值滿時會自動升級，增加最大 HP 和基礎攻擊力。</li>
+        <li>👑 收集 3 塊碎片後，就能挑戰最終魔王！</li>
+    </ul>
+
+    <p style="margin-top: 10px;">準備好你的冒險了嗎？</p>
+    <button onclick="startGame()">開始遊戲</button>
+</div>
+
+
+    <div id="nameInputScreen" class="panel" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+        <h2>輸入你的名字</h2>
+        <p>請輸入你的冒險者姓名（2-15個字）：</p>
+        <input type="text" id="playerNameInput" placeholder="你的名字" maxlength="15" style="padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ccc; width: 80%; max-width: 300px;">
+        <button onclick="submitName()" style="padding: 10px 20px; font-size: 1em; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">確認並開始冒險</button>
+    </div>
+
+    <!-- 🔽 新增：整個遊戲內容包進這個 game-container 裡，初始隱藏 -->
+    <div id="game-container" style="display: none;">
+        <div id="game-interface">
+            <h1>文字版冒險遊戲</h1>
+
+            <div class="panel" id="status"></div>
+            <div class="panel" id="location"></div>
+
+            <div class="panel" id="battle" style="display: none;">
+                <strong>你遇到了 <span id="monsterName">???</span>！</strong><br>
+                <span id="monsterName"></span> HP：<span id="monsterHp">0</span><br>
+                <button onclick="attack()">攻擊</button>
+                <button onclick="leaveBattle()">逃跑</button>
+            </div>
+
+            <div class="panel">
+                <strong>背包：</strong>
+                <div id="inventory"></div>
+            </div>
+
+        </div>
+
+        <div class="panel" id="log">
+            <strong>事件記錄：</strong>
+            <div id="log-content"></div>
+        </div>
+
+        <!-- ✅ 通關畫面 -->
+        <div id="endingScreen">
+            <h1>🎉 勇者傳說完結！🎉</h1>
+            <p>你擊敗了黑魔法師，拯救了這個世界！</p>
+            <p>世界恢復和平，人們將永遠記住你的名字：<strong id="endingPlayerName">小勇者</strong>。</p>
+            <button onclick="restartGame()">重新開始冒險</button>
+        </div>
+
+    </div>
+    <!-- 🔼 game-container 結束 -->
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
