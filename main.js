@@ -238,20 +238,20 @@ pageSprite: {
 
 // Boss 專屬武器掉落池
 const weaponPoolBossForest = [
-    { name: "自然之杖", power: 20, rarity: "傳說", chance: 1, healOnAttack: 5 }
+    { name: "自然之杖", power: 30, rarity: "傳說", chance: 1, healOnAttack: 5 }
 ];
 
 const weaponPoolBossHill = [
-    { name: "碎岩者巨錘", power: 30, rarity: "傳說", chance: 1, stunChance: 0.2 } // 新增 stunChance 屬性
+    { name: "碎岩者巨錘", power: 60, rarity: "傳說", chance: 1, stunChance: 0.2 } // 新增 stunChance 屬性
 ];
 
 const weaponPoolBossPerion = [
-    { name: "劇毒之爪", power: 40, rarity: "傳說", chance: 1, poisonChance: 0.3 } // 攻擊有30%機率使敵人中毒
+    { name: "劇毒之爪", power: 100, rarity: "傳說", chance: 1, poisonChance: 0.3 } // 攻擊有30%機率使敵人中毒
 ];
 
 const weaponPoolFinalBoss = [
-    { name: "世界毀滅者", power: 50, rarity: "傳說", chance: 0.05 },
-    { name: "創世之手套", power: 45, rarity: "傳說", chance: 0.03 }
+    { name: "世界毀滅者", power: 200, rarity: "傳說", chance: 0.05 },
+    { name: "創世之手套", power: 300, rarity: "傳說", chance: 0.03 }
 ];
 
 const gameBosses = {
@@ -290,7 +290,7 @@ const gameBosses = {
     finalBoss: {
         id: 'finalBoss',
         name: "黑魔法師",
-        hp: 1000,
+        hp: 1200,
         attackMin: 40,
         attackMax: 60,
         exp: 2000,
@@ -577,7 +577,7 @@ function enterShop(fromLocation) {
     } else {
         Object.values(sellableWeapons).forEach((data) => {
             const weapon = data.weaponObject;
-            const sellPrice = getSellPrice(weapon.rarity);
+            const sellPrice = getSellPrice(weapon); // ✅ 傳 weapon，不是 rarity
             const displayCount = data.count > 1 ? `（x${data.count}）` : '';
             shopHtml += `
                 【${weapon.name}${displayCount}】（${weapon.rarity}，攻擊 +${weapon.power}，賣價：${sellPrice}金幣）
@@ -628,18 +628,10 @@ function buyLargePotion() {
 }
 
 
-function getSellPrice(rarity) {
-    switch (rarity) {
-        case "普通":
-            return 5;
-        case "稀有":
-            return 15; // 提高稀有武器賣價
-        case "傳說":
-            return 50;
-        default:
-            return 1;
-    }
+function getSellPrice(weapon) {
+    return weapon.power * 3;
 }
+
 
 // 修改 sellWeapon 函式，接收武器名稱
 function sellWeapon(weaponName) {
@@ -655,7 +647,7 @@ function sellWeapon(weaponName) {
 
     if (foundIndex !== -1) {
         const weapon = player.inventory[foundIndex];
-        const sellPrice = getSellPrice(weapon.rarity);
+        const sellPrice = getSellPrice(weapon); // ✅ 傳 weapon，不是 rarity
 
         player.gold += sellPrice;
         player.inventory.splice(foundIndex, 1); // 只移除一個實例
