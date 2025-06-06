@@ -1318,6 +1318,9 @@ function winBattle(monsterName) {
             case 'shadowHound': // 從深淵裂縫的暗影獵犬戰鬥逃跑
                 goToAbyssalRift(); // 返回深淵裂縫
                 break;
+            case 'pageSprite':
+                goToAncientLibrary();
+                break;
             default:
                 goToTown();
                 break;
@@ -1454,6 +1457,9 @@ function leaveBattle() {
                 break;
             case 'shadowHound': // 從深淵裂縫的暗影獵犬戰鬥逃跑
                 goToAbyssalRift(); // 返回深淵裂縫
+                break;
+            case 'pageSprite':
+                goToAncientLibrary();
                 break;
             default:
                 goToTown();
