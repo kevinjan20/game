@@ -550,7 +550,7 @@ function enterShop(fromLocation) {
     let shopHtml = `
         <strong>你目前在：</strong> 商店<br>
         <button onclick="buyPotion()">購買藥水（${potionBuyPrice}金幣，回復${potionHealAmount}HP）</button><br>
-        <button onclick="buyLargePotion()">購買大藥水（${largePotionHealAmount}金幣，回復${largePotionHealAmount}HP）</button>
+        <button onclick="buyLargePotion()">購買大藥水（${largePotionBuyPrice}金幣，回復${largePotionHealAmount}HP）</button>
         <br><br>
         <strong>出售裝備：</strong><br>
     `;
